@@ -1,0 +1,411 @@
+#!/usr/bin/env python3
+"""初始化可复用的四盒模型 AI 工程化工作流项目骨架。"""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from textwrap import dedent
+
+
+def write_file(path: Path, content: str, force: bool, created: list[str], skipped: list[str]) -> None:
+    if path.exists() and not force:
+        skipped.append(str(path))
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(dedent(content).lstrip(), encoding="utf-8", newline="\n")
+    created.append(str(path))
+
+
+def mkdir(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+
+
+def build_files(task_name: str) -> dict[str, str]:
+    report_schema = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "AI 工作流实验报告",
+        "type": "object",
+        "required": ["experiment_id", "status", "comparison_group", "versions", "runtime", "metrics"],
+        "properties": {
+            "experiment_id": {"type": "string"},
+            "status": {"enum": ["completed", "failed", "invalid"]},
+            "comparison_group": {"type": "string"},
+            "versions": {"type": "object"},
+            "runtime": {"type": "object"},
+            "metrics": {"type": "object"},
+            "acceptance": {"type": "object"},
+            "problems": {"type": "array"},
+            "badcases": {"type": "array"},
+            "notes": {"type": "string"},
+        },
+    }
+
+    return {
+        "PROJECT_INTAKE.md": """
+        # 项目信息补齐清单
+
+        ## 使用方式
+        当项目刚初始化或核心文件仍有空白时，请让 AI 按本清单分批提问，并把回答写回对应文件。
+
+        ## 主动触发
+        当你问“下一步做什么”“今天做什么”“继续”“帮我看当前状态”时，AI 应主动读取 `STATUS.md`、`TASK_SPEC.md` 和本文件，判断当前阶段，并给出未来 3 到 5 步路线图、推荐顺序、首选方案和备选方案。若缺少关键信息，AI 应一次最多问 5 个问题，并给示例答案。
+
+        ## 1. TASK_SPEC.md
+        - 业务目标：
+        - 输入样例：
+        - 输出示例：
+        - 主指标：
+        - 验收线：
+        - 非目标：
+
+        示例：
+        目标：从客服对话中抽取投诉原因和责任部门。
+        输入：一段客服对话文本。
+        输出：`{"complaint_reason": "...", "department": "...", "evidence_span": "..."}`
+        主指标：complaint_reason micro-F1，验收线 0.82。
+
+        ## 2. data/schema.yaml
+        - 字段：
+        - 标签或实体：
+        - 关系：
+        - 边界规则：
+        - 冲突规则：
+
+        示例：
+        实体：PERSON、ORG、LOCATION。
+        关系：WORK_AT(PERSON, ORG)。
+        边界：地点包含行政区后缀，不包含前置介词。
+
+        ## 3. pipeline/skill_prompt.txt
+        - AI 角色：
+        - 输出格式：
+        - 必须遵守的规则：
+        - 不确定时的处理方式：
+        - 是否已有 baseline prompt：
+
+        示例：
+        角色：信息抽取助手。
+        输出：只输出 JSON。
+        不确定时：保留 evidence_span，并标记 confidence=low。
+
+        ## 4. STATUS.md
+        - 当前思考层级：
+        - 当前项目阶段：
+        - 当前版本：
+        - 最大阻塞：
+        - 下一步：
+
+        示例：
+        当前思考层级：项目启动规划。
+        阶段：刚初始化，还没有 baseline。
+        阻塞：缺少代表性样例和验收指标。
+        """,
+        "STATUS.md": f"""
+        # 项目状态
+
+        ## 当前焦点
+        - 当前思考层级：
+        - 当前盒子：
+        - 当前目标：{task_name}
+        - 下一步需要决策：
+
+        ## 业务与指标
+        - 任务定义版本：task-v1
+        - 主指标：
+        - 验收阈值：
+        - 待确认问题：
+
+        ## 数据与 GT
+        - Schema 版本：schema-v1
+        - 数据集版本：
+        - 数据切分版本：
+        - 已知 GT 问题：
+
+        ## Skill 与 Workflow
+        - 生产 Skill：
+        - 生产 Workflow：flow-default
+        - 候选变体：
+        - Runtime 假设：
+
+        ## 评估与迭代
+        - 当前 comparison group：
+        - 最新 baseline：
+        - 当前最佳候选：
+        - 待处理 badcase 主题：
+
+        ## 交接
+        - 已变更文件：
+        - 需要通知的其他盒子：
+        - 下次启动应读取：
+        """,
+        "docs/README.md": """
+        # 项目文档索引
+
+        给人看的项目文档统一放在本目录，或放在项目已有的文档目录中。
+
+        ## 建议存放
+        - 使用手册
+        - 设计文档
+        - 阶段总结
+        - 评审记录
+        - 决策说明
+
+        ## 例外
+        - 单次实验的人类可读报告 `report.md` 保存在对应 `experiments/` 目录。
+        - 可复用的 skill 规则、模板和脚本保存在 skill 目录，不在本项目文档目录维护。
+        """,
+        "TASK_SPEC.md": f"""
+        # 任务定义
+
+        ## 目标
+        {task_name}
+
+        ## 输入
+
+        ## 输出
+
+        ## 标签或 Schema 含义
+
+        ## 主指标
+        - 名称：
+        - 版本：metric-v1
+        - 公式或脚本：
+        - 验收阈值：
+
+        ## 护栏指标
+        - 时延：
+        - 成本：
+        - 失败率：
+        - 关键类别召回：
+
+        ## 非目标
+
+        ## 版本历史
+        - task-v1：初始任务定义。
+        """,
+        "data/README.md": """
+        # 数据与 GT
+
+        ## 当前版本
+        - schema：schema-v1
+        - dataset：
+        - split：
+
+        ## 标注规则
+
+        ## 版本历史
+        | 版本 | 日期 | 变更 | 备注 |
+        | --- | --- | --- | --- |
+        """,
+        "data/schema.yaml": """
+        schema_id: schema-v1
+        task_spec_version: task-v1
+        entities: []
+        relations: []
+        fields:
+          id:
+            type: string
+            required: true
+          text:
+            type: string
+            required: true
+        annotation_rules:
+          boundary_policy: 待填写
+          conflict_policy: 待填写
+        """,
+        "pipeline/config.yaml": """
+        task_spec_version: task-v1
+        schema_version: schema-v1
+        dataset_version: 待填写
+        split_version: 待填写
+        skill_version: skill-current
+        workflow_version: flow-default
+        metric_version: metric-v1
+        model:
+          name: 待填写
+          temperature: 0.1
+        paths:
+          prompt_file: pipeline/skill_prompt.txt
+          workflow_file: pipeline/workflow_config.yaml
+          data_file: 待填写
+        """,
+        "pipeline/skill_prompt.txt": """
+        待填写：当前生产版 Skill 或提示词。
+        """,
+        "pipeline/workflow_config.yaml": """
+        workflow_id: flow-default
+        schema_version: schema-v1
+        steps:
+          - id: predict
+            type: model_call
+            prompt_file: pipeline/skill_prompt.txt
+        """,
+        "grid.yaml": """
+        comparison_group: round-YYYY-MM-DD-01
+        factors:
+          skill: [skill-v1-baseline]
+          data: [gt-v1.0]
+          workflow: [flow-default]
+        controlled:
+          task_spec_version: task-v1
+          schema_version: schema-v1
+          split_version: split-dev-v1
+          metric_version: metric-v1
+          model: 待填写
+          temperature: 0.1
+        exclude: []
+        """,
+        "variants/manifest.yaml": """
+        skills:
+          skill-v1-baseline:
+            path: variants/skills/v1_baseline.txt
+            status: active
+            owner_box: skill_workflow
+        data:
+          gt-v1.0:
+            path: data/versions/gt_v1.0.jsonl
+            schema_version: schema-v1
+            split_version: split-dev-v1
+            status: active
+        workflows:
+          flow-default:
+            path: pipeline/workflow_config.yaml
+            status: active
+            compatible_schema: [schema-v1]
+        metrics:
+          metric-v1:
+            path: utils/metrics.py
+            primary: 待填写
+        """,
+        "experiments/CHANGELOG.md": """
+        # 实验变更日志
+
+        ## YYYY-MM-DD Round round-YYYY-MM-DD-01
+
+        ### 意图
+
+        ### 实验网格
+        - 变化因素：
+        - 控制因素：
+        - 排除组合：
+
+        ### 结果
+        - 最佳实验：
+        - Baseline：
+        - 主效应：
+        - 交互效应备注：
+        - 护栏指标备注：
+
+        ### 决策
+        - 晋升：
+        - 暂缓：
+        - 排查：
+
+        ### 下一轮 Grid
+        """,
+        "experiments/report_template.md": """
+        # 实验：<experiment_id>
+
+        ## 状态
+        - 结果：
+        - Comparison group：
+
+        ## 版本
+        - 任务定义：
+        - Schema：
+        - 数据集：
+        - 数据切分：
+        - Skill：
+        - Workflow：
+        - 指标：
+
+        ## 指标
+        | 指标 | 数值 | 目标/验收线 | 是否达标 |
+        | --- | ---: | ---: | --- |
+        | 主指标 |  |  |  |
+        | 精确率 |  |  |  |
+        | 召回率 |  |  |  |
+        | 成本 |  |  |  |
+        | 时延 |  |  |  |
+        | 失败率 |  |  |  |
+
+        ## 达标判断
+        - 结论：
+        - 未达标项：
+        - 与目标差距：
+
+        ## 存在的问题
+        1.
+
+        ## Badcase
+        1.
+
+        ## 可能原因
+        1.
+
+        ## 备注
+
+        ## 决策建议
+        """,
+        "experiments/report_schema.json": json.dumps(report_schema, ensure_ascii=False, indent=2),
+        "utils/metrics.py": """
+        \"\"\"项目指标实现。
+
+        指标语义必须在 TASK_SPEC.md 和实验报告中记录版本。
+        \"\"\"
+
+
+        def evaluate(predictions, ground_truth):
+            raise NotImplementedError("请在这里实现项目专属指标。")
+        """,
+        "variants/skills/v1_baseline.txt": """
+        待填写：基线 Skill 或提示词变体。
+        """,
+    }
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("project_root", help="目标项目目录。")
+    parser.add_argument("--task-name", default="AI 任务", help="人类可读的任务目标。")
+    parser.add_argument("--force", action="store_true", help="覆盖已有模板文件。")
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    root = Path(args.project_root).expanduser().resolve()
+
+    directories = [
+        "docs",
+        "data/raw",
+        "data/processed",
+        "data/versions",
+        "pipeline",
+        "experiments/reports",
+        "variants/skills",
+        "variants/data",
+        "variants/workflows",
+        "utils",
+    ]
+    for directory in directories:
+        mkdir(root / directory)
+
+    created: list[str] = []
+    skipped: list[str] = []
+    for rel_path, content in build_files(args.task_name).items():
+        write_file(root / rel_path, content, args.force, created, skipped)
+
+    print(f"已初始化 AI 工程化工作流：{root}")
+    print(f"已创建或更新文件数：{len(created)}")
+    if skipped:
+        print(f"跳过已有文件数：{len(skipped)}")
+        for path in skipped:
+            print(f"  {path}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI 工程化工作流"
+  short_description: "固化多层级 AI 项目工作流。"
+  default_prompt: "使用 $ai-engineering-workflow 初始化一个可复用的 AI 项目工作流。"

@@ -1,0 +1,268 @@
+# AI 工程化工作流模板
+
+当用户要求创建或修复工作流文件时，使用这些模板。项目特有内容应该写入项目目录，不要堆在 skill 里。
+
+## docs/README.md
+
+```markdown
+# 项目文档索引
+
+给人看的项目文档统一放在本目录，或放在项目已有的文档目录中。
+
+## 建议存放
+- 使用手册
+- 设计文档
+- 阶段总结
+- 评审记录
+- 决策说明
+
+## 例外
+- 单次实验的人类可读报告 `report.md` 保存在对应 `experiments/` 目录。
+- 可复用的 skill 规则、模板和脚本保存在 skill 目录，不在本项目文档目录维护。
+```
+
+## PROJECT_INTAKE.md
+
+```markdown
+# 项目信息补齐清单
+
+## 使用方式
+当以下信息缺失时，请让 AI 按本清单分批提问，并把回答写回对应文件。
+
+## 主动触发
+当你问“下一步做什么”“今天做什么”“继续”“帮我看当前状态”时，AI 应主动读取 `STATUS.md`、`TASK_SPEC.md` 和本文件，判断当前阶段，并给出未来 3 到 5 步路线图、推荐顺序、首选方案和备选方案。若缺少关键信息，AI 应一次最多问 5 个问题，并给示例答案。
+
+## 1. TASK_SPEC.md
+- 业务目标：
+- 输入样例：
+- 输出示例：
+- 主指标：
+- 验收线：
+- 非目标：
+
+示例：
+目标：从客服对话中抽取投诉原因和责任部门。
+输入：一段客服对话文本。
+输出：`{"complaint_reason": "...", "department": "...", "evidence_span": "..."}`
+主指标：complaint_reason micro-F1，验收线 0.82。
+
+## 2. data/schema.yaml
+- 字段：
+- 标签或实体：
+- 关系：
+- 边界规则：
+- 冲突规则：
+
+示例：
+实体：PERSON、ORG、LOCATION。
+关系：WORK_AT(PERSON, ORG)。
+边界：地点包含行政区后缀，不包含前置介词。
+
+## 3. pipeline/skill_prompt.txt
+- AI 角色：
+- 输出格式：
+- 必须遵守的规则：
+- 不确定时的处理方式：
+- 是否已有 baseline prompt：
+
+示例：
+角色：信息抽取助手。
+输出：只输出 JSON。
+不确定时：保留 evidence_span，并标记 confidence=low。
+
+## 4. STATUS.md
+- 当前思考层级：
+- 当前项目阶段：
+- 当前版本：
+- 最大阻塞：
+- 下一步：
+
+示例：
+当前思考层级：项目启动规划。
+阶段：刚初始化，还没有 baseline。
+阻塞：缺少代表性样例和验收指标。
+```
+
+## STATUS.md
+
+```markdown
+# 项目状态
+
+## 当前焦点
+- 当前思考层级：
+- 当前盒子：
+- 当前目标：
+- 下一步需要决策：
+
+## 业务与指标
+- 任务定义版本：
+- 主指标：
+- 验收阈值：
+- 待确认问题：
+
+## 数据与 GT
+- Schema 版本：
+- 数据集版本：
+- 数据切分版本：
+- 已知 GT 问题：
+
+## Skill 与 Workflow
+- 生产 Skill：
+- 生产 Workflow：
+- 候选变体：
+- Runtime 假设：
+
+## 评估与迭代
+- 当前 comparison group：
+- 最新 baseline：
+- 当前最佳候选：
+- 待处理 badcase 主题：
+
+## 交接
+- 已变更文件：
+- 需要通知的其他盒子：
+- 下次启动应读取：
+```
+
+## TASK_SPEC.md
+
+```markdown
+# 任务定义
+
+## 目标
+
+## 输入
+
+## 输出
+
+## 标签或 Schema 含义
+
+## 主指标
+- 名称：
+- 版本：
+- 公式或脚本：
+- 验收阈值：
+
+## 护栏指标
+- 时延：
+- 成本：
+- 失败率：
+- 关键类别召回：
+
+## 非目标
+
+## 版本历史
+- task-v1：
+```
+
+## data/schema.yaml
+
+```yaml
+schema_id: schema-v1
+task_spec_version: task-v1
+entities: []
+relations: []
+fields:
+  id:
+    type: string
+    required: true
+  text:
+    type: string
+    required: true
+annotation_rules:
+  boundary_policy: 待填写
+  conflict_policy: 待填写
+```
+
+## grid.yaml
+
+```yaml
+comparison_group: round-YYYY-MM-DD-01
+factors:
+  skill: [skill-v1-baseline, skill-v2-fewshot]
+  data: [gt-v2.0, gt-v2.1]
+  workflow: [flow-default, flow-filter]
+controlled:
+  task_spec_version: task-v1
+  schema_version: schema-v1
+  split_version: split-dev-v1
+  metric_version: metric-v1
+  model: gpt-4.1
+  temperature: 0.1
+exclude:
+  - {skill: skill-v1-baseline, workflow: flow-filter}
+```
+
+## report.md
+
+```markdown
+# 实验：<experiment_id>
+
+## 状态
+- 结果：
+- Comparison group：
+
+## 版本
+- 任务定义：
+- Schema：
+- 数据集：
+- 数据切分：
+- Skill：
+- Workflow：
+- 指标：
+
+## 指标
+| 指标 | 数值 | 目标/验收线 | 是否达标 |
+| --- | ---: | ---: | --- |
+| 主指标 |  |  |  |
+| 精确率 |  |  |  |
+| 召回率 |  |  |  |
+| 成本 |  |  |  |
+| 时延 |  |  |  |
+| 失败率 |  |  |  |
+
+## 达标判断
+- 结论：
+- 未达标项：
+- 与目标差距：
+
+## 存在的问题
+1.
+
+## Badcase
+1. 
+
+## 可能原因
+1.
+
+## 备注
+
+## 决策建议
+```
+
+## experiments/CHANGELOG.md 条目
+
+```markdown
+## YYYY-MM-DD Round <id>
+
+### 意图
+
+### 实验网格
+- 变化因素：
+- 控制因素：
+- 排除组合：
+
+### 结果
+- 最佳实验：
+- Baseline：
+- 主效应：
+- 交互效应备注：
+- 护栏指标备注：
+
+### 决策
+- 晋升：
+- 暂缓：
+- 排查：
+
+### 下一轮 Grid
+```
