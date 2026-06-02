@@ -69,10 +69,11 @@ $SkillDir = Join-Path $CodexHome "skills\ai-engineering-workflow"
 Test-Path (Join-Path $SkillDir "SKILL.md")
 Test-Path (Join-Path $SkillDir "agents\openai.yaml")
 Test-Path (Join-Path $SkillDir "scripts\init_ai_workflow_project.py")
+Test-Path (Join-Path $SkillDir "references\protocols.md")
 Test-Path (Join-Path $SkillDir "references\templates.md")
 ```
 
-四项都应返回 `True`。
+五项都应返回 `True`。
 
 可选：如果要用 `skill-creator` 自带校验脚本验证中文 skill，请先开启 UTF-8：
 
@@ -97,6 +98,7 @@ ai-engineering-workflow/
 |-- references/
 |   |-- interface-contracts.md
 |   |-- intake-guide.md
+|   |-- protocols.md
 |   `-- templates.md
 `-- scripts/
     `-- init_ai_workflow_project.py

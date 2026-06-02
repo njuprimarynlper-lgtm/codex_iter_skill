@@ -152,6 +152,21 @@ def build_files(task_name: str) -> dict[str, str]:
         - 评审记录
         - 决策说明
 
+        ## 文档索引
+        | 文档 | 位置 | 用途 |
+        | --- | --- | --- |
+        | 使用手册 | docs/ai_engineering_workflow_user_manual_zh.md | 给人看的操作说明。 |
+        | 设计文档 | docs/ai_engineering_workflow_design_doc_zh.md | 给维护者看的系统设计、接口和协议说明。 |
+        | 任务定义 | TASK_SPEC.md | 说明业务目标、输入输出、指标和验收线。 |
+        | 数据说明 | data/README.md | 说明数据版本、GT 变更和标注规则。 |
+        | 实验日志 | experiments/CHANGELOG.md | 说明实验意图、结果和决策。 |
+
+        ## 维护规则
+        - 每次逻辑修改后，必须同步更新对应说明文档。
+        - 新的一天开始修改前，先确认历史未提交改动是否需要提交 Git。
+        - 若没有合适文档，先在本索引登记新文档的位置和用途。
+        - 交付时说明本次更新了哪些说明文档。
+
         ## 例外
         - 单次实验的人类可读报告 `report.md` 保存在对应 `experiments/` 目录。
         - 可复用的 skill 规则、模板和脚本保存在 skill 目录，不在本项目文档目录维护。

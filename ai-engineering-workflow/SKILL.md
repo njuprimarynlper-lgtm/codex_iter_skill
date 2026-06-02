@@ -44,8 +44,11 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 | --- | --- |
 | 用户问“下一步做什么”“今天做什么”“继续”“当前状态” | `references/protocols.md` 的“下一步诊断协议” |
 | 指令不明确，且可能影响方向、版本、数据、实验结论或生产配置 | `references/protocols.md` 的“不明确指令确认协议” |
+| 新的一天开始修改前，或发现上次改动尚未提交 | `references/protocols.md` 的“新日修改前 Git 提交检查协议” |
 | 涉及 GT、标注规则、验收标准或边界定义变化 | `references/protocols.md` 的“GT 标准变更确认协议” |
+| 业务标准、GT、评测基准、验收线、Skill、Prompt、Workflow、评估口径或生产配置变化后，需要检查上下游是否漏改 | `references/protocols.md` 的“影响链检查与修正协议” |
 | 完成 Skill、Workflow、数据处理、评估脚本或关键配置迭代 | `references/protocols.md` 的“方案迭代测试门” |
+| 修改 workflow 逻辑、skill 规则、协议、模板、脚本、评估逻辑或项目流程 | `references/protocols.md` 的“逻辑修改文档同步协议” |
 | 生成给人看的手册、设计文档、阶段总结、评审记录或决策说明 | `references/protocols.md` 的“项目文档归档协议” |
 | 比较实验、汇总实验、晋升胜出方案或处理无效实验 | `references/protocols.md` 的“实验比较与晋升协议” |
 | 初始化后缺少任务、数据、Skill 或状态信息 | `references/intake-guide.md` |
@@ -57,14 +60,31 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 
 - 每次改动先归属到一个盒子，再为其他盒子写交接说明。
 - 每次新项目或新会话先复用这套流程，而不是临场重新发明规划清单。
+- 新的一天开始做文件或逻辑修改前，先检查是否存在历史未提交改动，并询问用户是否需要先提交 Git；未经用户确认不要替用户提交。
+- 每次逻辑修改都必须同步更新相应说明文档，并在最终回复里列出更新的文档位置；没有对应说明文档时，先更新或创建项目 `docs/README.md` 的文档索引。
 - 用户问“下一步做什么”时，不要只回答一个动作；必须给出下几步、推荐顺序、候选方案和首选建议。
 - 指令不明确且会影响关键方向或重要产物时，必须先确认；低风险细节可以声明假设后继续。
 - 给人看的项目产物统一放在当前项目的 `docs/` 或项目已有文档目录；skill 目录只放可复用规则、模板、脚本和 reference。
 - GT、标注规则、验收标准或边界定义变更必须先向用户确认标准，再更新数据或评估结论。
+- 业务标准、GT、评测基准、验收线、Skill、Prompt、Workflow、评估口径或生产配置发生变化后，必须自动执行影响链检查，主动列出可能需要同步修正的文件或产物，并在实质修改前向用户确认是否修改、修改哪些项。
 - 每次方案迭代后主动询问是否跑测试或评估；测试不达标时必须输出当轮指标、问题、典型 badcase、可能原因和下一轮建议。
 - 所有可比较产物都要版本化：任务定义、Schema、GT、Skill、Workflow、指标、报告 Schema、实验配置。
 - 每个实验必须同时输出 `report.json` 和 `report.md`：前者给机器汇总，后者给人阅读。
 - 不要静默修改已完成的实验目录；实验有误时标记为 invalid，并重新生成新实验。
+
+## 说明文档索引
+
+以下是标准项目相对路径；如果具体项目已有不同文档目录，优先使用项目现有目录，并在 `docs/README.md` 里登记。
+
+| 说明文档 | 位置 | 用途 |
+| --- | --- | --- |
+| 项目文档索引 | `docs/README.md` | 记录给人看的文档位置、用途、维护规则和最近同步情况。 |
+| 使用手册 | `docs/ai_engineering_workflow_user_manual_zh.md` | 给人看的操作说明，重点写人要做什么、AI 会帮什么、产出什么、如何验收。 |
+| 设计文档 | `docs/ai_engineering_workflow_design_doc_zh.md` | 给维护者看的系统设计、接口契约、协议、风险和术语解释。 |
+| 任务定义 | `TASK_SPEC.md` | 说明业务目标、输入输出、主指标、护栏指标和验收线。 |
+| 数据说明 | `data/README.md` | 说明数据版本、GT 变更、标注规则和质量风险。 |
+| 实验日志 | `experiments/CHANGELOG.md` | 说明实验意图、结果、决策、晋升、回滚和下一轮计划。 |
+| 实验人工报告 | `experiments/*/report.md` | 说明单次实验指标、达标判断、问题、badcase 和建议。 |
 
 ## 常见任务
 
@@ -84,7 +104,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 
 ### 方案迭代后的测试闭环
 
-完成 Skill、Workflow、数据处理、评估脚本或关键配置修改后，读取 `references/protocols.md` 的“方案迭代测试门”，询问是否运行测试或评估，并按达标/不达标/无法测试三类结果输出。
+完成 Skill、Workflow、数据处理、评估脚本或关键配置修改后，先读取 `references/protocols.md` 的“影响链检查与修正协议”进行自动复查；用户确认需要修正的影响项后，再读取“方案迭代测试门”，询问是否运行测试或评估，并按达标/不达标/无法测试三类结果输出。
 
 ### 关闭一次会话
 
@@ -99,7 +119,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 
 ## 详细参考
 
-- `references/protocols.md`：下一步诊断、不明确指令确认、GT 标准确认、方案迭代测试门、文档归档、实验比较与晋升、中文文件编码。
+- `references/protocols.md`：下一步诊断、不明确指令确认、新日 Git 提交检查、GT 标准确认、影响链检查与修正、方案迭代测试门、逻辑修改文档同步、文档归档、实验比较与晋升、中文文件编码。
 - `references/interface-contracts.md`：盒子归属、交接契约、Schema、验证门和防止盒子漂移的检查项。
 - `references/intake-guide.md`：初始化后缺少信息时，应该向用户询问什么、为什么问、答案可以长什么样。
 - `references/templates.md`：`STATUS.md`、`TASK_SPEC.md`、manifest、grid、实验配置、报告和 changelog 的简洁模板。
