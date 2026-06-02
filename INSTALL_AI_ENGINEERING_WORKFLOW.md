@@ -6,7 +6,7 @@
 - 源目录：`D:\skill\ai-engineering-workflow`
 - 压缩包：`D:\skill\ai-engineering-workflow.zip`
 - 安装目标：`$CODEX_HOME\skills\ai-engineering-workflow`；如果未设置 `CODEX_HOME`，使用 `$HOME\.codex\skills\ai-engineering-workflow`
-- 触发方式：在任务中提到 `$ai-engineering-workflow`、`AI 算法研发管家`、`AI 工程化工作流`、开工检查、下一步诊断、主动巡检、长期记忆、项目启动规划、GT/data、workflow、评估指标、实验报告、四盒模型等。
+- 触发方式：在任务中提到 `$ai-engineering-workflow`、`AI 算法研发管家`、`AI 工程化工作流`、当前工作焦点、开工检查、下一步诊断、新日有效结论固化、主动巡检、长期记忆、项目启动规划、GT/data、workflow、评估指标、实验报告、四盒模型等。
 
 ## Codex 执行步骤
 
@@ -87,7 +87,7 @@ python "$HOME\.codex\skills\.system\skill-creator\scripts\quick_validate.py" $Sk
 然后重启 Codex，让新 skill 进入可发现列表。重启后可以用下面这句话测试触发：
 
 ```text
-使用 $ai-engineering-workflow 对当前项目做一次开工管家检查，并给出下一步诊断。
+使用 $ai-engineering-workflow 读取当前项目状态，先锚定当前工作焦点，再给出下一步诊断。
 ```
 
 ## 预期目录结构
