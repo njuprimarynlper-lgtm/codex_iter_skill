@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""初始化可复用的四盒模型 AI 工程化工作流项目骨架。"""
+"""初始化可复用的 AI 算法研发管家型项目骨架。"""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ def mkdir(path: Path) -> None:
 def build_files(task_name: str) -> dict[str, str]:
     report_schema = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "AI 工作流实验报告",
+        "title": "AI 算法研发管家实验报告",
         "type": "object",
         "required": ["experiment_id", "status", "comparison_group", "versions", "runtime", "metrics"],
         "properties": {
@@ -50,7 +50,7 @@ def build_files(task_name: str) -> dict[str, str]:
         当项目刚初始化或核心文件仍有空白时，请让 AI 按本清单分批提问，并把回答写回对应文件。
 
         ## 主动触发
-        当你问“下一步做什么”“今天做什么”“继续”“帮我看当前状态”时，AI 应主动读取 `STATUS.md`、`TASK_SPEC.md` 和本文件，判断当前阶段，并给出未来 3 到 5 步路线图、推荐顺序、首选方案和备选方案。若缺少关键信息，AI 应一次最多问 5 个问题，并给示例答案。
+        当你问“下一步做什么”“今天做什么”“继续”“帮我看当前状态”时，AI 应主动读取 `STATUS.md`、`TASK_SPEC.md` 和本文件，判断当前阶段，并给出未来 3 到 5 步路线图、推荐顺序、首选方案和备选方案。若项目没有最近巡检记录，或存在未验证改动、待确认标准、缺失报告、文档未同步，AI 应主动提醒你可以做一次巡检。若缺少关键信息，AI 应一次最多问 5 个问题，并给示例答案。
 
         ## 1. TASK_SPEC.md
         - 业务目标：
@@ -94,13 +94,18 @@ def build_files(task_name: str) -> dict[str, str]:
         - 当前思考层级：
         - 当前项目阶段：
         - 当前版本：
+        - 当前最优结果：
         - 最大阻塞：
         - 下一步：
+        - 最近巡检：
+        - 最近记忆压缩：
 
         示例：
         当前思考层级：项目启动规划。
         阶段：刚初始化，还没有 baseline。
         阻塞：缺少代表性样例和验收指标。
+        最近巡检：未执行。
+        最近记忆压缩：未执行。
         """,
         "STATUS.md": f"""
         # 项目状态
@@ -135,10 +140,45 @@ def build_files(task_name: str) -> dict[str, str]:
         - 当前最佳候选：
         - 待处理 badcase 主题：
 
+        ## 长期记忆
+        - 当前最优结果：
+        - 最近记忆压缩时间：
+        - 待归档历史结果：
+        - 待合并摘要：
+
         ## 交接
         - 已变更文件：
         - 需要通知的其他盒子：
         - 下次启动应读取：
+        """,
+        "PROJECT_MEMORY.md": """
+        # 项目长期记忆
+
+        本文件只保存当前仍有决策价值的压缩记忆。完整实验历史保存在 `experiments/CHANGELOG.md` 和各实验报告中。
+
+        ## 当前有效结论
+        - 暂无。项目初始化后，阶段性结论形成时再写入。
+
+        ## 当前最优结果
+        - 方案：暂无。
+        - 依据：暂无。
+        - 适用条件：暂无。
+        - 护栏风险：暂无。
+        - 来源：暂无。
+
+        ## 待确认假设
+        - 暂无。
+
+        ## 下一轮优先级
+        1. 暂无。
+
+        ## 已归档历史结果
+        | 时间 | 结果或方案 | 归档原因 | 来源 | 是否可比较 |
+        | --- | --- | --- | --- | --- |
+
+        ## 已合并摘要
+        | 合并时间 | 合并来源 | 当前摘要位置 | 备注 |
+        | --- | --- | --- | --- |
         """,
         "docs/README.md": """
         # 项目文档索引
@@ -157,13 +197,16 @@ def build_files(task_name: str) -> dict[str, str]:
         | --- | --- | --- |
         | 使用手册 | docs/ai_engineering_workflow_user_manual_zh.md | 给人看的操作说明。 |
         | 设计文档 | docs/ai_engineering_workflow_design_doc_zh.md | 给维护者看的系统设计、接口和协议说明。 |
+        | 项目长期记忆 | PROJECT_MEMORY.md | 记录当前有效结论、当前最优结果、待确认假设和历史归档。 |
         | 任务定义 | TASK_SPEC.md | 说明业务目标、输入输出、指标和验收线。 |
         | 数据说明 | data/README.md | 说明数据版本、GT 变更和标注规则。 |
         | 实验日志 | experiments/CHANGELOG.md | 说明实验意图、结果和决策。 |
 
         ## 维护规则
         - 每次逻辑修改后，必须同步更新对应说明文档。
+        - 执行动作前先按授权边界判断：低风险直接做，中风险先提醒，高风险必须确认。
         - 新的一天开始修改前，先确认历史未提交改动是否需要提交 Git。
+        - 阶段性结论形成后，更新 `PROJECT_MEMORY.md`，只保留当前最优结果，历史结果归档。
         - 若没有合适文档，先在本索引登记新文档的位置和用途。
         - 交付时说明本次更新了哪些说明文档。
 
@@ -413,7 +456,7 @@ def main() -> int:
     for rel_path, content in build_files(args.task_name).items():
         write_file(root / rel_path, content, args.force, created, skipped)
 
-    print(f"已初始化 AI 工程化工作流：{root}")
+    print(f"已初始化 AI 算法研发管家型项目：{root}")
     print(f"已创建或更新文件数：{len(created)}")
     if skipped:
         print(f"跳过已有文件数：{len(skipped)}")

@@ -1,4 +1,4 @@
 interface:
-  display_name: "AI 工程化工作流"
-  short_description: "固化多层级 AI 项目工作流。"
-  default_prompt: "使用 $ai-engineering-workflow 初始化一个可复用的 AI 项目工作流。"
+  display_name: "AI 算法研发管家型 Skill"
+  short_description: "主动管理算法研发的开工检查、层级路由、影响链巡检和交接。"
+  default_prompt: "使用 $ai-engineering-workflow 初始化一个 AI 算法研发管家型项目。"
