@@ -22,12 +22,14 @@
 | 使用手册 | docs/ai_engineering_workflow_user_manual_zh.md | 给人看的操作说明。 |
 | 设计文档 | docs/ai_engineering_workflow_design_doc_zh.md | 给维护者看的系统设计、接口和协议说明。 |
 | 项目长期记忆 | PROJECT_MEMORY.md | 记录当前有效结论、当前最优结果、待确认假设和历史归档。 |
+| 编辑授权边界 | EDIT_SCOPE.md | 维护 AI 可修改文件白名单、确认区和禁止区。 |
 | 任务定义 | TASK_SPEC.md | 说明业务目标、输入输出、指标和验收线。 |
 | 数据说明 | data/README.md | 说明数据版本、GT 变更和标注规则。 |
 | 实验日志 | experiments/CHANGELOG.md | 说明实验意图、结果和决策。 |
 
 ## 维护规则
 - 每次逻辑修改后，必须同步更新对应说明文档。
+- 每次写文件前，先按 `EDIT_SCOPE.md` 判断文件是否在可修改白名单；未确认过的文件必须先问用户。
 - 执行动作前先按授权边界判断：低风险直接做，中风险先提醒，高风险必须确认。
 - 新的一天开始任何会写文件的动作前，先确认历史未提交改动是否需要提交 Git；固化昨日结论/方法也算写文件动作。
 - Git 检查完成或确认不适用后，再检查前一天形成的有效结论和方法是否需要固化；不确定要固化的必须询问用户。
@@ -221,6 +223,56 @@
 
 ## 已合并摘要
 | 合并时间 | 合并来源 | 当前摘要位置 | 备注 |
+| --- | --- | --- | --- |
+```
+
+## EDIT_SCOPE.md
+
+```markdown
+# 编辑授权边界
+
+## 匹配顺序
+1. forbidden
+2. confirm_required
+3. always_allowed
+4. generated_outputs
+5. task_scoped
+6. unmatched -> confirm_required
+
+## always_allowed
+| 模式 | 用途 | 备注 |
+| --- | --- | --- |
+| `STATUS.md` | 当前状态和交接 | 仅限短状态，不写长期历史 |
+| `PROJECT_MEMORY.md` | 当前有效长期记忆 | 改变当前最优/历史归档前仍需确认 |
+| `docs/README.md` | 文档索引 | 不写长正文 |
+| `docs/archive/**` | 文档归档 | 保留来源和归档原因 |
+| `tmp/**` | 临时诊断产物 | 不作为正式结论 |
+
+## generated_outputs
+| 模式 | 用途 |
+| --- | --- |
+| `experiments/**/report.md` | 单次实验人工报告 |
+| `experiments/**/report.json` | 单次实验结构化报告 |
+
+## confirm_required
+| 模式 | 原因 |
+| --- | --- |
+| `data/**` | 数据、GT 或样本可能影响评估 |
+| `eval_kit/**` | 指标和评估口径 |
+| `pipeline/**` | 生产流程 |
+| `autokg_pipeline/**` | 业务/模型逻辑 |
+| `tests/**` | 验证口径会影响结论可信度 |
+| `experiments/CHANGELOG.md` | 实验历史和决策记录 |
+
+## forbidden
+| 模式 | 原因 |
+| --- | --- |
+| `.git/**` | Git 内部数据 |
+| `.env` | 本地密钥 |
+| `**/*secret*` | 潜在密钥 |
+
+## task_scoped
+| 时间 | 用户授权 | 模式 | 过期条件 |
 | --- | --- | --- | --- |
 ```
 
