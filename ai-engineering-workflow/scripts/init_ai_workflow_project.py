@@ -238,6 +238,7 @@ def build_files(task_name: str) -> dict[str, str]:
         - Git 检查完成或确认不适用后，再检查前一天形成的有效结论和方法是否需要固化；不确定要固化的必须询问用户。
         - 开工、下一步诊断和收尾时，必须维护 `STATUS.md` 的当前工作焦点；跨窗口继续时优先围绕该焦点给路线图。
         - 阶段性结论形成后，更新 `PROJECT_MEMORY.md`，只保留当前最优结果，历史结果归档。
+        - Markdown 不得无限增长；`STATUS.md`/本索引超过 200 行、`PROJECT_MEMORY.md` 超过 300 行、普通说明文档超过 600 行时，先压缩、归档或拆分，再继续追加。
         - 若没有合适文档，先在本索引登记新文档的位置和用途。
         - 交付时说明本次更新了哪些说明文档。
 
@@ -485,6 +486,7 @@ def main() -> int:
 
     directories = [
         "docs",
+        "docs/archive",
         "data/raw",
         "data/processed",
         "data/versions",
