@@ -48,6 +48,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 | 新窗口恢复项目、用户问下一步、用户切换方向、任务完成/受阻/测试后需要调整主线，或当前建议与 `STATUS.md` 当前焦点不一致 | `references/protocols.md` 的“当前工作焦点动态更新协议” |
 | 用户说“开工”“今天开始”“继续昨天”“今天继续”或新会话需要恢复项目状态 | `references/protocols.md` 的“开工管家检查协议” |
 | 用户问“下一步做什么”“今天做什么”“继续”“当前状态” | `references/protocols.md` 的“下一步诊断协议” |
+| 用户要求分析单条新数据、单个样本、单个 badcase、单个模型输出或一条 GT/预测差异 | `references/sample-analysis.md` |
 | 判断某个动作 AI 能否直接做、是否需要提醒、是否必须先问用户 | `references/protocols.md` 的“操作授权与确认协议” |
 | 指令不明确，且可能影响方向、版本、数据、实验结论或生产配置 | `references/protocols.md` 的“不明确指令确认协议” |
 | 新的一天开始修改前，或发现上次改动尚未提交 | `references/protocols.md` 的“新日修改前 Git 提交检查协议” |
@@ -73,6 +74,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 - 每次改动先归属到一个盒子，再为其他盒子写交接说明。
 - 每次新项目、新会话或新一天开工时，先执行开工管家检查，再决定是否进入下一步诊断、信息补齐、Git 检查或主动巡检。
 - 每次新窗口恢复、开工、下一步诊断和会话收尾时，必须读取并维护 `STATUS.md` 的“当前工作焦点”；如果用户当前请求与工作焦点无关，要先说明偏离点，并给出继续当前焦点或切换焦点的选择。
+- 当用户明确给出单条数据、样本 ID、badcase、模型输出、文件片段或一条 GT/预测差异要求分析时，必须优先完成该样本级任务；`STATUS.md` 当前焦点只能作为背景，不得把任务自动改写成稳定性分析、整体指标分析、实验汇总或下一步路线图。
 - 用户明确给出新主线、优先级或阶段变化时，应更新当前工作焦点；如果只是模型推断要替换、降级或归档当前主线，必须先向用户确认。
 - 新的一天开始任何会写文件的动作前，先执行新日修改前 Git 提交检查；固化昨日结论/方法也属于会写文件的动作，未经用户选择不要先写入 `PROJECT_MEMORY.md`、项目文档或日志。
 - Git 检查完成或确认不适用后，再检查前一天是否形成有效结论或可复用方法；明确有效的要固化到 `PROJECT_MEMORY.md`、项目文档或对应日志，不确定是否该固化的必须先问用户。
@@ -150,6 +152,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 ## 详细参考
 
 - `references/protocols.md`：当前工作焦点动态更新、开工管家检查、下一步诊断、新日 Git 提交检查、新日有效结论与方法固化、操作授权与确认、不明确指令确认、GT 标准确认、影响链检查与修正、主动巡检、方案迭代测试门、逻辑修改文档同步、行为纠偏与 Skill 自动更新、文档归档、实验比较与晋升、长期记忆压缩与结果归档、中文文件编码。
+- `references/sample-analysis.md`：单条新数据、样本、badcase、GT/预测差异的局部分析规则。
 - `references/markdown-lifecycle.md`：Markdown 长度预算、压缩、归档、拆分和淘汰规则。
 - `references/interface-contracts.md`：盒子归属、交接契约、Schema、验证门和防止盒子漂移的检查项。
 - `references/intake-guide.md`：初始化后缺少信息时，应该向用户询问什么、为什么问、答案可以长什么样。
