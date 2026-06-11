@@ -25,6 +25,36 @@
 
 任何 Markdown 超过硬上限时，不得继续追加正文；必须先压缩、归档、拆分或淘汰。
 
+## 硬边界检查脚本
+
+新增或追加 Markdown 前，必须先运行：
+
+```bash
+python <skill-dir>/scripts/check_markdown_budget.py <project-root-or-markdown-file>
+```
+
+脚本只检测，不自动修改文件。默认递归扫描目录中的 Markdown，并忽略 `.git/`、`node_modules/`、`tmp/`、`log/`、缓存目录等生成物；直接传入具体文件时即使位于这些目录也会检查。
+
+退出码：
+
+- `0`：未达到失败阈值。
+- `1`：在 `--fail-on budget` 或更严格模式下超过建议预算。
+- `2`：超过 hard limit。不得继续追加正文，必须先压缩、归档、拆分或淘汰。
+- `3`：在 `--fail-on near` 模式下接近建议预算。
+
+常用命令：
+
+```bash
+# 默认只在超过 hard limit 时失败，只展示 near/over/hard 问题
+python <skill-dir>/scripts/check_markdown_budget.py <project-root>
+
+# 作为更严格的写入前检查：超过建议预算也失败
+python <skill-dir>/scripts/check_markdown_budget.py <project-root> --fail-on budget
+
+# 输出机器可读结果
+python <skill-dir>/scripts/check_markdown_budget.py <project-root> --json-out markdown_budget.json
+```
+
 ## 处理顺序
 
 1. 先测量：记录目标文件行数、大小、用途和是否接近预算。

@@ -82,7 +82,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 - Git 检查完成或确认不适用后，再检查前一天是否形成有效结论或可复用方法；明确有效的要固化到 `PROJECT_MEMORY.md`、项目文档或对应日志，不确定是否该固化的必须先问用户。
 - 如果项目已有多轮实验、GT/指标裁定、当前最优或废弃结论，且 `PROJECT_MEMORY.md` 不存在，不能只提醒缺失；必须进入长期记忆压缩协议，先生成创建草案并请用户确认，确认后创建 `PROJECT_MEMORY.md`。
 - 每次逻辑修改都必须同步更新相应说明文档，并在最终回复里列出更新的文档位置；没有对应说明文档时，先更新或创建项目 `docs/README.md` 的文档索引。
-- 永远不要让一个 Markdown 文件无限增长；新增内容前先判断目标文件长度和用途，超过预算时必须先压缩当前有效内容、归档历史内容或淘汰无决策价值内容，再写入新内容。
+- 永远不要让一个 Markdown 文件无限增长；新增或追加 Markdown 前，必须先运行 `scripts/check_markdown_budget.py` 检查目标文件或项目根目录。超过 hard limit 时不得继续追加正文，必须先压缩当前有效内容、归档历史内容或淘汰无决策价值内容。
 - 用户问“下一步做什么”时，不要只回答一个动作；必须先锚定当前工作焦点，再给出下几步、推荐顺序、候选方案和首选建议；不得跳到与当前焦点无关的方向，除非说明原因并请用户确认切换。
 - 所有操作先按授权边界分级：低风险可直接做并事后汇报；中风险先说明影响和默认处理；高风险必须先问用户。凡是影响指标、GT、验收、生产配置、实验结论、历史归档或不可逆操作的，都按高风险处理。
 - 指令不明确且会影响关键方向或重要产物时，必须先确认；低风险细节可以声明假设后继续。
@@ -157,7 +157,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 - `references/protocols.md`：当前工作焦点动态更新、开工管家检查、下一步诊断、新日 Git 提交检查、新日有效结论与方法固化、操作授权与确认、不明确指令确认、GT 标准确认、影响链检查与修正、主动巡检、方案迭代测试门、逻辑修改文档同步、行为纠偏与 Skill 自动更新、文档归档、实验比较与晋升、长期记忆压缩与结果归档、中文文件编码。
 - `references/edit-scope.md`：可修改文件白名单、确认边界、禁止修改区和本轮临时授权规则。
 - `references/sample-analysis.md`：单条新数据、样本、badcase、GT/预测差异的局部分析规则。
-- `references/markdown-lifecycle.md`：Markdown 长度预算、压缩、归档、拆分和淘汰规则。
+- `references/markdown-lifecycle.md`：Markdown 长度预算、压缩、归档、拆分和淘汰规则；用 `scripts/check_markdown_budget.py` 执行硬边界检查。
 - `references/interface-contracts.md`：盒子归属、交接契约、Schema、验证门和防止盒子漂移的检查项。
 - `references/intake-guide.md`：初始化后缺少信息时，应该向用户询问什么、为什么问、答案可以长什么样。
 - `references/templates.md`：`STATUS.md`、`TASK_SPEC.md`、manifest、grid、实验配置、报告和 changelog 的简洁模板。
