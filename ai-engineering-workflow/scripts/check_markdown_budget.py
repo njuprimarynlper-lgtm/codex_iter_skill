@@ -42,7 +42,7 @@ class Result:
 BUDGETS = {
     "status_or_docs_index": Budget("STATUS.md or docs/README.md", 200, 12, 300, 20),
     "project_memory": Budget("PROJECT_MEMORY.md", 300, 20, 450, 32),
-    "task_or_data_spec": Budget("TASK_SPEC.md or data/README.md", 400, 32, 600, 48),
+    "task_or_data_spec": Budget("TASK_SPEC.md, PROJECT_CONSTRAINTS.md or data/README.md", 400, 32, 600, 48),
     "experiment_changelog": Budget("experiments/CHANGELOG.md", 500, 48, 800, 80),
     "experiment_report": Budget("experiments/*/report.md", 500, 48, 700, 80),
     "longform_doc": Budget("manual/design/decision doc", 600, 64, 900, 96),
@@ -88,13 +88,13 @@ def classify_markdown(path: Path) -> str:
         return "status_or_docs_index"
     if name == "project_memory.md":
         return "project_memory"
-    if name == "task_spec.md" or (name == "readme.md" and parent == "data"):
+    if name in {"task_spec.md", "project_constraints.md"} or (name == "readme.md" and parent == "data"):
         return "task_or_data_spec"
     if name == "changelog.md" and "experiments" in parts:
         return "experiment_changelog"
     if name == "report.md" and "experiments" in parts:
         return "experiment_report"
-    if parent == "references" and "skills" in parts:
+    if parent == "references":
         return "skill_reference"
     if any(marker in name for marker in ("manual", "design", "decision", "guide", "手册", "设计", "决策")):
         return "longform_doc"

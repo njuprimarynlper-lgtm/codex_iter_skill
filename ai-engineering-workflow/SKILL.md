@@ -24,7 +24,7 @@ description: "AI 算法研发管家型 Skill，用于在个人或小团队算法
 
 进入已有项目时：
 
-1. 读取 `STATUS.md`、`PROJECT_MEMORY.md`（如果存在）、`TASK_SPEC.md`，以及当前盒子的专属文件。
+1. 读取 `PROJECT_CONSTRAINTS.md`（如果存在）、`STATUS.md`、`PROJECT_MEMORY.md`（如果存在）、`TASK_SPEC.md`，以及当前盒子的专属文件。
 2. 先识别 `STATUS.md` 中的“当前工作焦点”；如果缺失、过期或与用户请求冲突，进入“当前工作焦点动态更新协议”。
 3. 判断用户请求属于哪个思考层级和哪个盒子。
 4. 按任务类型读取下方对应 reference，不要一次性加载全部 reference。
@@ -50,6 +50,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 | 用户问“下一步做什么”“今天做什么”“继续”“当前状态” | `references/protocols.md` 的“下一步诊断协议” |
 | 用户要求分析单条新数据、单个样本、单个 badcase、单个模型输出或一条 GT/预测差异 | `references/sample-analysis.md` |
 | 任何准备创建、修改、移动、删除文件的任务，或需要判断哪些文件能改、哪些必须先确认 | `references/edit-scope.md` |
+| 进入项目、执行任务前需要识别项目独有约束，或用户要求记录/修改项目约束 | `references/project-constraints.md` |
 | 判断某个动作 AI 能否直接做、是否需要提醒、是否必须先问用户 | `references/protocols.md` 的“操作授权与确认协议” |
 | 指令不明确，且可能影响方向、版本、数据、实验结论或生产配置 | `references/protocols.md` 的“不明确指令确认协议” |
 | 新的一天开始修改前，或发现上次改动尚未提交 | `references/protocols.md` 的“新日修改前 Git 提交检查协议” |
@@ -74,6 +75,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 
 - 每次改动先归属到一个盒子，再为其他盒子写交接说明。
 - 每次创建、修改、移动或删除文件前，必须先读取项目根目录 `EDIT_SCOPE.md`（如果存在）并匹配可修改白名单；未在白名单且本轮用户未明确点名的文件，必须先向用户确认。若 `EDIT_SCOPE.md` 不存在，先按“无持久授权”处理，输出拟修改文件清单并请用户确认是否创建/更新白名单。
+- 每次进入项目、开工、下一步诊断或执行任务前，必须读取项目根目录 `PROJECT_CONSTRAINTS.md`（如果存在）；当前指令与项目约束冲突时，先说明当前约束和冲突点，等用户确认临时豁免或更新约束后再继续。若文件不存在，不得编造项目约束；用户给出稳定约束时应建议创建或更新该文件。
 - 每次新项目、新会话或新一天开工时，先执行开工管家检查，再决定是否进入下一步诊断、信息补齐、Git 检查或主动巡检。
 - 每次新窗口恢复、开工、下一步诊断和会话收尾时，必须读取并维护 `STATUS.md` 的“当前工作焦点”；如果用户当前请求与工作焦点无关，要先说明偏离点，并给出继续当前焦点或切换焦点的选择。
 - 当用户明确给出单条数据、样本 ID、badcase、模型输出、文件片段或一条 GT/预测差异要求分析时，必须优先完成该样本级任务；`STATUS.md` 当前焦点只能作为背景，不得把任务自动改写成稳定性分析、整体指标分析、实验汇总或下一步路线图。
@@ -85,6 +87,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 - 永远不要让一个 Markdown 文件无限增长；新增或追加 Markdown 前，必须先运行 `scripts/check_markdown_budget.py` 检查目标文件或项目根目录。超过 hard limit 时不得继续追加正文，必须先压缩当前有效内容、归档历史内容或淘汰无决策价值内容。
 - 用户问“下一步做什么”时，不要只回答一个动作；必须先锚定当前工作焦点，再给出下几步、推荐顺序、候选方案和首选建议；不得跳到与当前焦点无关的方向，除非说明原因并请用户确认切换。
 - 所有操作先按授权边界分级：低风险可直接做并事后汇报；中风险先说明影响和默认处理；高风险必须先问用户。凡是影响指标、GT、验收、生产配置、实验结论、历史归档或不可逆操作的，都按高风险处理。
+- 当项目明确规定模型/API 访问服务只能通过某个源码文件硬编码切换时，该源码位置就是生产配置的唯一真相源。不得新增或保留会覆盖它的环境变量、service profile、launcher 参数、外层配置注入或默认值漂移；切换服务只能修改用户指定的硬编码位置，并同步项目状态、说明文档和影响链。
 - 指令不明确且会影响关键方向或重要产物时，必须先确认；低风险细节可以声明假设后继续。
 - 给人看的项目产物统一放在当前项目的 `docs/` 或项目已有文档目录；skill 目录只放可复用规则、模板、脚本和 reference。
 - GT、标注规则、验收标准或边界定义变更必须先向用户确认标准，再更新数据或评估结论。
@@ -113,6 +116,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 | 项目文档索引 | `docs/README.md` | 记录给人看的文档位置、用途、维护规则和最近同步情况。 |
 | 使用手册 | `docs/ai_engineering_workflow_user_manual_zh.md` | 给人看的操作说明，重点写人要做什么、AI 会帮什么、产出什么、如何验收。 |
 | 设计文档 | `docs/ai_engineering_workflow_design_doc_zh.md` | 给维护者看的系统设计、接口契约、协议、风险和术语解释。 |
+| 项目独有约束 | `PROJECT_CONSTRAINTS.md` | 记录当前项目特有的必须遵守、默认禁止、默认假设和冲突处理规则。 |
 | 项目长期记忆 | `PROJECT_MEMORY.md` | 记录当前有效结论、最优结果、废弃结论、待确认假设、不可比较历史和下一轮优先级。 |
 | 任务定义 | `TASK_SPEC.md` | 说明业务目标、输入输出、主指标、护栏指标和验收线。 |
 | 数据说明 | `data/README.md` | 说明数据版本、GT 变更、标注规则和质量风险。 |
@@ -156,6 +160,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 
 - `references/protocols.md`：当前工作焦点动态更新、开工管家检查、下一步诊断、新日 Git 提交检查、新日有效结论与方法固化、操作授权与确认、不明确指令确认、GT 标准确认、影响链检查与修正、主动巡检、方案迭代测试门、逻辑修改文档同步、行为纠偏与 Skill 自动更新、文档归档、实验比较与晋升、长期记忆压缩与结果归档、中文文件编码。
 - `references/edit-scope.md`：可修改文件白名单、确认边界、禁止修改区和本轮临时授权规则。
+- `references/project-constraints.md`：项目独有约束文件的读取、冲突确认、更新和归属规则。
 - `references/sample-analysis.md`：单条新数据、样本、badcase、GT/预测差异的局部分析规则。
 - `references/markdown-lifecycle.md`：Markdown 长度预算、压缩、归档、拆分和淘汰规则；用 `scripts/check_markdown_budget.py` 执行硬边界检查。
 - `references/interface-contracts.md`：盒子归属、交接契约、Schema、验证门和防止盒子漂移的检查项。

@@ -17,7 +17,7 @@
 | --- | ---: | ---: | --- |
 | `STATUS.md`、`docs/README.md` | 200 行或 12 KB | 300 行或 20 KB | 只保留当前焦点、下一步、索引和最近交接；旧交接归档 |
 | `PROJECT_MEMORY.md` | 300 行或 20 KB | 450 行或 32 KB | 只保留当前有效结论、当前最优、待确认假设和来源链接；历史结果归档 |
-| `TASK_SPEC.md`、`data/README.md` | 400 行或 32 KB | 600 行或 48 KB | 保留当前标准；版本历史、旧规则和长示例拆到专门文档 |
+| `TASK_SPEC.md`、`PROJECT_CONSTRAINTS.md`、`data/README.md` | 400 行或 32 KB | 600 行或 48 KB | 保留当前标准和当前约束；版本历史、旧规则和长示例拆到专门文档 |
 | `experiments/CHANGELOG.md` | 500 行或 48 KB | 800 行或 80 KB | 按阶段或日期拆分；主文件只保留索引、当前比较组和最近决策 |
 | 单次 `experiments/*/report.md` | 500 行或 48 KB | 700 行或 80 KB | 详细 badcase、日志和样例放到 `artifacts/` 或附录文件 |
 | 使用手册、设计文档、决策说明 | 600 行或 64 KB | 900 行或 96 KB | 按主题拆分，入口文档只保留导航和关键结论 |
@@ -75,7 +75,7 @@ python <skill-dir>/scripts/check_markdown_budget.py <project-root> --json-out ma
 - `STATUS.md`：只保留当前工作焦点、当前阶段、阻塞、下一步、最近一次交接和待用户确认项。最多保留最近 3 次交接摘要。
 - `PROJECT_MEMORY.md`：只保留当前仍有决策价值的压缩记忆；当前推荐方案只保留一个。历史候选保留链接，不保留全文。
 - `docs/README.md`：只能做索引和维护规则，不写长篇说明、实验复盘或使用手册正文。
-- `TASK_SPEC.md`：只保留当前任务定义、当前指标、当前验收线和当前边界。旧版本写入“版本历史索引”，正文移走。
+- `TASK_SPEC.md`、`PROJECT_CONSTRAINTS.md`：只保留当前任务定义、当前指标、当前验收线、当前边界和当前项目约束。旧版本写入“版本历史索引”，正文移走。
 - `experiments/CHANGELOG.md`：保留实验索引、比较组、晋升/回滚决策和不可比较说明；单次实验细节留在对应报告。
 - `report.md`：保留人要读的结论、指标、关键 badcase 和下一轮建议；完整日志、全量样例和大表格不要塞进报告正文。
 

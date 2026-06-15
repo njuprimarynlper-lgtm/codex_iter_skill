@@ -37,7 +37,7 @@
 
 执行步骤：
 
-1. 读取 `STATUS.md`、`PROJECT_MEMORY.md`（如果存在）和 `TASK_SPEC.md`。
+1. 读取 `PROJECT_CONSTRAINTS.md`（如果存在）、`STATUS.md`、`PROJECT_MEMORY.md`（如果存在）和 `TASK_SPEC.md`。
 2. 检查 `STATUS.md` 是否包含“当前工作焦点”；若缺失，先从最近交接、项目记忆和用户当前请求中提取候选焦点。
 3. 判断用户当前请求与焦点关系：
    - 明确局部执行任务：直接完成用户指定动作，最多补充它与当前焦点的关系，不自动切换任务。
@@ -82,7 +82,7 @@
 
 执行步骤：
 
-1. 读取 `STATUS.md`、`PROJECT_MEMORY.md`（如果存在）和 `TASK_SPEC.md`；如果存在 `PROJECT_INTAKE.md`，也读取它。
+1. 读取 `PROJECT_CONSTRAINTS.md`（如果存在）、`STATUS.md`、`PROJECT_MEMORY.md`（如果存在）和 `TASK_SPEC.md`；如果存在 `PROJECT_INTAKE.md`，也读取它。
 2. 先执行“当前工作焦点动态更新协议”：识别焦点、判断当前请求是否相关、必要时更新或请求确认。
 3. 判断当前阶段：刚初始化、信息不足、需要建立 baseline、需要补数据、需要跑实验、需要汇总、需要决策或需要收尾。
 4. 输出未来 3 到 5 步路线图，必须围绕当前工作焦点展开，包含推荐顺序、所属盒子、预期产出和依赖。
@@ -127,7 +127,7 @@
 
 执行步骤：
 
-1. 读取 `STATUS.md`、`PROJECT_MEMORY.md`（如果存在）、`TASK_SPEC.md` 和 `docs/README.md`；如果存在 `experiments/CHANGELOG.md`，也读取最近一轮记录。
+1. 读取 `PROJECT_CONSTRAINTS.md`（如果存在）、`STATUS.md`、`PROJECT_MEMORY.md`（如果存在）、`TASK_SPEC.md` 和 `docs/README.md`；如果存在 `experiments/CHANGELOG.md`，也读取最近一轮记录。
 2. 判断当前是否是新的一天或新会话恢复；如果是新的一天且后续可能写入文件，包括固化昨日结论/方法，先进入“新日修改前 Git 提交检查协议”。
 3. Git 检查完成、用户选择已记录或确认当前不是 Git 仓库后，再进入“新日有效结论与方法固化协议”。
 4. 执行“当前工作焦点动态更新协议”，确认新窗口或新一天应优先围绕哪些主线推进。
@@ -411,6 +411,7 @@ GT 文件中的 `confidence` 只能作为候选排序、复核优先级和历史
 - 涉及业务标准、GT、评测基准、验收线、生产配置、历史实验结论或高风险数据修改时，必须先向用户确认是否修改、修改哪些项。
 - 对于用户已明确授权的低风险说明文档同步，可以直接更新，但最终回复必须列出已更新文件。
 - 如果用户暂不确认修正，必须把待修正项写入 `STATUS.md`、`experiments/CHANGELOG.md` 或本轮交接摘要中的待办。
+- 若触发源是模型/API 访问服务切换，且项目要求服务只能硬编码切换，必须把被指定的源码配置位置视为唯一真相源；影响链检查要主动查找并处理可能覆盖它的环境变量、service profile、launcher 参数、外层 `PipelineConfig` 注入和文档默认值。
 
 执行步骤：
 
