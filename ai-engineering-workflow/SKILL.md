@@ -49,6 +49,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 | 用户说“开工”“今天开始”“继续昨天”“今天继续”或新会话需要恢复项目状态 | `references/protocols.md` 的“开工管家检查协议” |
 | 用户问“下一步做什么”“今天做什么”“继续”“当前状态” | `references/protocols.md` 的“下一步诊断协议” |
 | 用户要求分析单条新数据、单个样本、单个 badcase、单个模型输出或一条 GT/预测差异 | `references/sample-analysis.md` |
+| 执行用户命令前需要判断“为什么做这件事”、命令是否服务真实目标、是否存在更合适的执行路径 | `references/intent-alignment.md` |
 | 任何准备创建、修改、移动、删除文件的任务，或需要判断哪些文件能改、哪些必须先确认 | `references/edit-scope.md` |
 | 进入项目、执行任务前需要识别项目独有约束，或用户要求记录/修改项目约束 | `references/project-constraints.md` |
 | 判断某个动作 AI 能否直接做、是否需要提醒、是否必须先问用户 | `references/protocols.md` 的“操作授权与确认协议” |
@@ -73,6 +74,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 
 ## 不可压缩硬规则
 
+- 执行用户命令前，必须先用一句内部判断或简短外显说明识别用户做这件事的目的：要解决什么问题、希望得到什么产物、当前命令是否服务该目的。若字面命令和目的可能不一致，或存在更低风险/更直接的做法，先说明判断并向用户确认；不要机械执行与目标脱节的动作。
 - 每次改动先归属到一个盒子，再为其他盒子写交接说明。
 - 每次创建、修改、移动或删除文件前，必须先读取项目根目录 `EDIT_SCOPE.md`（如果存在）并匹配可修改白名单；未在白名单且本轮用户未明确点名的文件，必须先向用户确认。若 `EDIT_SCOPE.md` 不存在，先按“无持久授权”处理，输出拟修改文件清单并请用户确认是否创建/更新白名单。
 - 每次进入项目、开工、下一步诊断或执行任务前，必须读取项目根目录 `PROJECT_CONSTRAINTS.md`（如果存在）；当前指令与项目约束冲突时，先说明当前约束和冲突点，等用户确认临时豁免或更新约束后再继续。若文件不存在，不得编造项目约束；用户给出稳定约束时应建议创建或更新该文件。
@@ -159,6 +161,7 @@ python <skill-dir>/scripts/init_ai_workflow_project.py <project-root> --task-nam
 ## 详细参考
 
 - `references/protocols.md`：当前工作焦点动态更新、开工管家检查、下一步诊断、新日 Git 提交检查、新日有效结论与方法固化、操作授权与确认、不明确指令确认、GT 标准确认、影响链检查与修正、主动巡检、方案迭代测试门、逻辑修改文档同步、行为纠偏与 Skill 自动更新、文档归档、实验比较与晋升、长期记忆压缩与结果归档、中文文件编码。
+- `references/intent-alignment.md`：执行用户命令前的目的识别、目标对齐、偏差确认和外显说明规则。
 - `references/edit-scope.md`：可修改文件白名单、确认边界、禁止修改区和本轮临时授权规则。
 - `references/project-constraints.md`：项目独有约束文件的读取、冲突确认、更新和归属规则。
 - `references/sample-analysis.md`：单条新数据、样本、badcase、GT/预测差异的局部分析规则。
